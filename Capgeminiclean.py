@@ -106,6 +106,27 @@ def stockAnalysis(ticker, period):
     max_close = df_1y["Close"].max()
     df_1y["Percent_Below_Max"] = ((max_close - df_1y["Close"]) / max_close) * 100
 
+
+    # --- Price as % of 1-year high ---
+
+#   Rolling 1-year high (252 trading days)
+    df["52w_high"] = df["Close"].rolling(window=252).max()
+
+    # Close price expressed as % of that high
+    df["pct_of_high"] = df["Close"] / df["52w_high"] * 100
+
+    # Plot it
+    fig_high, ax_high = plt.subplots(figsize=(12, 6))
+    ax_high.plot(df.index, df["pct_of_high"], color="steelblue", linewidth=1.5)
+    ax_high.axhline(100, color="green", linestyle="--", linewidth=1, label="At 1-year high (100%)")
+    ax_high.set_title("CAP.PA — Close Price as % of 1-Year High")
+    ax_high.set_ylabel("% of 52-week high")
+    ax_high.set_xlabel("Date")
+    ax_high.legend()
+    ax_high.grid(True, alpha=0.3)
+
+    st.pyplot(fig_high)
+
     fig4 = plt.figure(figsize=(12, 6))
     plt.plot(df_1y.index, df_1y["Percent_Below_Max"], linewidth=2)
     plt.title(ticker + " - Daily Close Price Variation From 1-Year Max")
