@@ -98,14 +98,7 @@ def stockAnalysis(ticker, period):
     st.pyplot(fig3)
     plt.close(fig3)
 
-    # 1 Year Close vs High
-    df_1y = yf.download(ticker, period="1y", interval="1d")
-    if isinstance(df_1y.columns, pd.MultiIndex):
-        df_1y.columns = df_1y.columns.droplevel(1)
-    df_1y = df_1y[["Close"]].dropna()
-    max_close = df_1y["Close"].max()
-    df_1y["Percent_Below_Max"] = ((max_close - df_1y["Close"]) / max_close) * 100
-
+    
 
     # --- Price as % of 1-year high ---
 
@@ -127,15 +120,7 @@ def stockAnalysis(ticker, period):
 
     st.pyplot(fig_high)
 
-    fig4 = plt.figure(figsize=(12, 6))
-    plt.plot(df_1y.index, df_1y["Percent_Below_Max"], linewidth=2)
-    plt.title(ticker + " - Daily Close Price Variation From 1-Year Max")
-    plt.xlabel("Date")
-    plt.ylabel("% Below Max Close Price")
-    plt.grid(True, linestyle="--", alpha=0.4)
-    plt.tight_layout()
-    st.pyplot(fig4)
-    plt.close(fig4)
+    
 
     # Price with +/- 2 Standard Deviation Bands
     avg_price = df['Close'].mean()
