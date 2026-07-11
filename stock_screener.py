@@ -30,6 +30,14 @@ def stockAnalysis(ticker, period):
     with st.expander("Summary Statistics"):
         st.dataframe(df.describe())
 
+    stock_info = yf.Ticker(ticker).info
+    trailing_pe = stock_info.get("trailingPE")
+    forward_pe = stock_info.get("forwardPE")
+
+    col1, col2 = st.columns(2)
+    col1.metric("Trailing P/E", f"{trailing_pe:.1f}" if trailing_pe is not None else "n/a")
+    col2.metric("Forward P/E", f"{forward_pe:.1f}" if forward_pe is not None else "n/a")
+
     # Calculate RSI
     delta = df['Close'].diff()
     gain = delta.clip(lower=0)
