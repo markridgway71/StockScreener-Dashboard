@@ -1,5 +1,7 @@
 import yfinance as yf
 import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import streamlit as st
 
@@ -127,6 +129,7 @@ def stockAnalysis(ticker, period):
     ax_high.grid(True, alpha=0.3)
 
     st.pyplot(fig_high)
+    plt.close(fig_high)
 
     
 
