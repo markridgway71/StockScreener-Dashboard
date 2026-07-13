@@ -41,6 +41,7 @@ def stockAnalysis(ticker, period):
     # col1.metric("Trailing P/E", f"{trailing_pe:.1f}" if trailing_pe is not None else "n/a")
     # col2.metric("Forward P/E", f"{forward_pe:.1f}" if forward_pe is not None else "n/a")
 
+    st.subheader("Momentum & Trend")
     # Calculate RSI
     delta = df['Close'].diff()
     gain = delta.clip(lower=0)
@@ -67,6 +68,25 @@ def stockAnalysis(ticker, period):
     st.pyplot(fig1)
     plt.close(fig1)
 
+    import yfinance as yf
+    import matplotlib.pyplot as plt
+
+    ticker = "CAP.PA"
+    df = yf.download(ticker, period="2y", interval="1d")
+
+    df["MA50"] = df["Close"].squeeze().rolling(window=50).mean()
+    df["MA120"] = df["Close"].squeeze().rolling(window=120).mean()
+    df["MA200"] = df["Close"].squeeze().rolling(window=200).mean()
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(df.index, df["Close"].squeeze(), color="steelblue", linewidth=1.5, label="Close")
+    plt.plot(df.index, df["MA50"], color="orange", linewidth=1, label="50-day MA")
+    plt.plot(df.index, df["MA120"], color="green", linewidth=1, label="120-day MA")
+    plt.plot(df.index, df["MA200"], color="red", linewidth=1, label="200-day MA")
+    plt.title(f"{ticker} — Price with Moving Averages")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.show()
     # Calculate Volatility
     df['Daily_Return'] = df['Close'].pct_change()
     df['Volatility'] = df['Daily_Return'].rolling(window=30).std() * (252 ** 0.5)
