@@ -68,25 +68,24 @@ def stockAnalysis(ticker, period):
     st.pyplot(fig1)
     plt.close(fig1)
 
-    import yfinance as yf
-    import matplotlib.pyplot as plt
-
-    ticker = "CAP.PA"
-    df = yf.download(ticker, period="2y", interval="1d")
-
+    
+    
     df["MA50"] = df["Close"].squeeze().rolling(window=50).mean()
     df["MA120"] = df["Close"].squeeze().rolling(window=120).mean()
     df["MA200"] = df["Close"].squeeze().rolling(window=200).mean()
 
-    plt.figure(figsize=(12, 6))
-    plt.plot(df.index, df["Close"].squeeze(), color="steelblue", linewidth=1.5, label="Close")
-    plt.plot(df.index, df["MA50"], color="orange", linewidth=1, label="50-day MA")
-    plt.plot(df.index, df["MA120"], color="green", linewidth=1, label="120-day MA")
-    plt.plot(df.index, df["MA200"], color="red", linewidth=1, label="200-day MA")
-    plt.title(f"{ticker} — Price with Moving Averages")
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.show()
+    fig_ma, ax_ma = plt.subplots(figsize=(12, 6))
+    ax_ma.plot(df.index, df["Close"].squeeze(), color="steelblue", linewidth=1.5, label="Close")
+    ax_ma.plot(df.index, df["MA50"], color="orange", linewidth=1, label="50-day MA")
+    ax_ma.plot(df.index, df["MA120"], color="green", linewidth=1, label="120-day MA")
+    ax_ma.plot(df.index, df["MA200"], color="red", linewidth=1, label="200-day MA")
+    ax_ma.set_title(f"{ticker} — Price with Moving Averages")
+    ax_ma.set_ylabel("Price")
+    ax_ma.set_xlabel("Date")
+    ax_ma.legend()
+    ax_ma.grid(True, alpha=0.3)
+    st.pyplot(fig_ma)
+    plt.close(fig_ma)
     # Calculate Volatility
     df['Daily_Return'] = df['Close'].pct_change()
     df['Volatility'] = df['Daily_Return'].rolling(window=30).std() * (252 ** 0.5)
