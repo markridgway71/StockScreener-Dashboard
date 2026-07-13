@@ -51,7 +51,6 @@ def stockAnalysis(ticker, period):
     st.pyplot(fig_price)
     plt.close(fig_price)
 
-   st.subheader("Momentum & Trend")
     # Calculate RSI
     delta = df['Close'].diff()
     gain = delta.clip(lower=0)
