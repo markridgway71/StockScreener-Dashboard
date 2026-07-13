@@ -41,7 +41,17 @@ def stockAnalysis(ticker, period):
     # col1.metric("Trailing P/E", f"{trailing_pe:.1f}" if trailing_pe is not None else "n/a")
     # col2.metric("Forward P/E", f"{forward_pe:.1f}" if forward_pe is not None else "n/a")
 
-    st.subheader("Momentum & Trend")
+   # --- Price chart ---
+    fig_price, ax_price = plt.subplots(figsize=(12, 6))
+    ax_price.plot(df.index, df["Close"].squeeze(), color="steelblue", linewidth=1.5)
+    ax_price.set_title(f"{ticker} — Closing Price")
+    ax_price.set_ylabel("Price")
+    ax_price.set_xlabel("Date")
+    ax_price.grid(True, alpha=0.3)
+    st.pyplot(fig_price)
+    plt.close(fig_price)
+
+   st.subheader("Momentum & Trend")
     # Calculate RSI
     delta = df['Close'].diff()
     gain = delta.clip(lower=0)
