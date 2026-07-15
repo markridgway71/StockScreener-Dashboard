@@ -33,21 +33,31 @@ def stockAnalysis(ticker, period):
     with st.expander("Summary Statistics"):
         st.dataframe(df.describe())
 
-    # stock_info = yf.Ticker(ticker).info
-    # trailing_pe = stock_info.get("trailingPE")
-    # forward_pe = stock_info.get("forwardPE")
+    stock_info = yf.Ticker(ticker).info
+    trailing_pe = stock_info.get("trailingPE")
+    forward_pe = stock_info.get("forwardPE")
 
-    # col1, col2 = st.columns(2)
-    # col1.metric("Trailing P/E", f"{trailing_pe:.1f}" if trailing_pe is not None else "n/a")
-    # col2.metric("Forward P/E", f"{forward_pe:.1f}" if forward_pe is not None else "n/a")
+    col1, col2 = st.columns(2)
+    col1.metric("Trailing P/E", f"{trailing_pe:.1f}" if trailing_pe is not None else "n/a")
+    col2.metric("Forward P/E", f"{forward_pe:.1f}" if forward_pe is not None else "n/a")
 
    # --- Price chart ---
-    fig_price, ax_price = plt.subplots(figsize=(12, 6))
-    ax_price.plot(df.index, df["Close"].squeeze(), color="steelblue", linewidth=1.5)
-    ax_price.set_title(f"{ticker} — Closing Price")
-    ax_price.set_ylabel("Price")
-    ax_price.set_xlabel("Date")
-    ax_price.grid(True, alpha=0.3)
+    # --- Price and volume chart ---
+    fig_price, (ax_p, ax_v) = plt.subplots(
+        2, 1, figsize=(12, 8), sharex=True,
+        gridspec_kw={"height_ratios": [3, 1]}
+    )
+
+    ax_p.plot(df.index, df["Close"].squeeze(), color="steelblue", linewidth=1.5)
+    ax_p.set_title(f"{ticker} — Closing Price and Volume")
+    ax_p.set_ylabel("Price")
+    ax_p.grid(True, alpha=0.3)
+
+    ax_v.bar(df.index, df["Volume"].squeeze(), color="grey", width=1.0)
+    ax_v.set_ylabel("Volume")
+    ax_v.set_xlabel("Date")
+    ax_v.grid(True, alpha=0.3)
+
     st.pyplot(fig_price)
     plt.close(fig_price)
 
@@ -182,6 +192,25 @@ def stockAnalysis(ticker, period):
     st.pyplot(fig5)
     plt.close(fig5)
 
+# --- Return distribution table ---
+    returns = df["Close"].squeeze().pct_change() * 100
+
+    bins = [-float("inf"), -10, -5, 0, 5, 10, float("inf")]
+    labels = ["More than -10%", "-9.99% to -5%", "-4.99% to 0%",
+              "0.1% to 5%", "5.01% to 9.99%", ">10%"]
+
+    buckets = pd.cut(returns.dropna(), bins=bins, labels=labels)
+    counts = buckets.value_counts().reindex(labels)
+    pcts = (counts / counts.sum() * 100).round(1)
+
+    return_table = pd.DataFrame({
+    "Return Bucket": labels,
+    "Number of Observations": counts.values,
+    "% of Occurrences": pcts.values
+    })
+
+    st.subheader("Daily Return Distribution")
+    st.dataframe(return_table, hide_index=True)
 
 # Run the analysis - note: NOT indented, so it sits outside the function
 stockAnalysis(ticker, period)
